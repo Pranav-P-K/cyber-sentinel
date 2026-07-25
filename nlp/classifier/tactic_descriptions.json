@@ -1,0 +1,16 @@
+{
+  "TA0043": "Reconnaissance: port scanning with nmap, network mapping, OS fingerprinting, vulnerability scanning, mass scanning, service enumeration, OSINT gathering, whois lookup, DNS enumeration",
+  "TA0042": "Resource Development: acquiring domains, provisioning servers, email accounts, staging malware infrastructure, setting up C2 servers, buying exploit kits, creating fake personas",
+  "TA0001": "Initial Access: phishing emails, exploiting public-facing web apps, drive-by downloads, stolen credentials, supply chain compromise, valid accounts, external remote services",
+  "TA0002": "Execution: PowerShell scripts, command-line execution, scheduled tasks, web shell execution, malicious attachments, scripting interpreter, native API abuse, WMI command execution",
+  "TA0003": "Persistence: registry run keys, startup items, account creation, web shells, service installation, boot-level mechanisms, cron jobs, logon scripts, browser extensions",
+  "TA0004": "Privilege Escalation: exploiting sudo, token impersonation, DLL injection, kernel exploits, UAC bypass, process injection, access token manipulation, setuid binaries",
+  "TA0005": "Defense Evasion: disabling AV tools, log clearing, rootkits, payload encoding, process masquerading, timestomping, obfuscated files, indicator removal, masquerading",
+  "TA0006": "Credential Access: SSH-Patator brute force, FTP-Patator, credential dumping, keylogging, Mimikatz, hash cracking, password spraying, kerberoasting, NTLM relay, credential stuffing",
+  "TA0007": "Discovery: network scanning, file enumeration, process listing, Active Directory queries, system information gathering, account discovery, permission groups, network share enumeration",
+  "TA0008": "Lateral Movement: SMB file shares, RDP, pass-the-hash, SSH tunneling, WMI remote execution, PsExec, internal spearphishing, remote services exploitation, software deployment",
+  "TA0009": "Collection: keylogging, screen capture, clipboard data, email collection, data from file shares, audio capture, video capture, browser session hijacking, input capture",
+  "TA0010": "Exfiltration: large HTTPS outbound transfers, DNS tunneling, FTP exfiltration, data staging and compression, exfil over C2 channel, exfil to cloud storage, scheduled transfer",
+  "TA0011": "Command and Control: C2 beacons, IRC callbacks, HTTP and HTTPS C2, DNS C2, Cobalt Strike, Metasploit handlers, botnet communication, domain fronting, encrypted channels, proxy usage",
+  "TA0040": "Impact: ransomware encryption, DDoS flood attacks, data wiping, service disruption, defacement, resource hijacking, disk wipe, endpoint denial of service, network denial of service"
+}

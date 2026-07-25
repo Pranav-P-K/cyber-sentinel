@@ -1,0 +1,12 @@
+# Python 3.11 — all packages have pre-built Windows wheels for cp311
+spacy==3.7.5
+sentence-transformers==3.0.1
+transformers==4.42.4
+# PyTorch: install separately with CPU index URL (see setup.ps1)
+# torch==2.3.1  -- installed via: pip install torch==2.3.1 --index-url https://download.pytorch.org/whl/cpu
+numpy==1.26.4
+scikit-learn==1.5.1
+stix2==3.0.1
+pandas==2.2.2
+scipy==1.13.1
+editdistance==0.8.1

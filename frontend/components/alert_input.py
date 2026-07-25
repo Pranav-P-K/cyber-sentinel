@@ -1,0 +1,1 @@
+# Alert upload/paste widget

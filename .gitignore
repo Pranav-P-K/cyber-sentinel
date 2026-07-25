@@ -1,0 +1,50 @@
+/project_docs/
+/scripts/
+/paper/
+# Added by setup_structure.py
+# Environment
+.env
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Data (too large for git)
+data/
+data/raw/
+data/processed/
+data/chroma_db/
+data/knowledge_base/mitre_stix/
+data/knowledge_base/nvd_feeds/
+data/knowledge_base/cisa_kev/
+*.csv
+*.db
+*.gz
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.user
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Docker
+.dockerignore
+
+# Evaluation results (large)
+evaluation/results/*.json
+evaluation/results/*.csv

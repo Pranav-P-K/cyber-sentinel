@@ -1,0 +1,10 @@
+ragas==0.1.13
+datasets==2.20.0
+pandas==2.2.2
+matplotlib==3.9.1.post1
+seaborn==0.13.2
+scikit-learn==1.5.1
+editdistance==0.8.1
+scipy==1.13.1
+transformers==4.42.4
+torch==2.3.1

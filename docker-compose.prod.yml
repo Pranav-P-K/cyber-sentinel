@@ -1,0 +1,11 @@
+version: "3.9"
+# Production overrides — used on Day 9+
+services:
+  backend:
+    environment:
+      DEBUG: "false"
+    restart: always
+  frontend:
+    restart: always
+  redis:
+    restart: always
