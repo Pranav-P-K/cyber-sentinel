@@ -1,1 +1,536 @@
-[]
+[
+  {
+    "scenario_id": "S001",
+    "name": "SSH Brute-Force to Initial Access",
+    "description": "Single attacker performs credential brute-force via SSH then achieves successful login.",
+    "alerts": [
+      {
+        "alert_id": "a001-1",
+        "timestamp": "2017-07-04T09:00:00",
+        "src_ip": "172.16.0.1",
+        "dst_ip": "192.168.10.50",
+        "dst_port": 22,
+        "protocol": "TCP",
+        "attack_type": "SSH-Patator",
+        "flow_bytes_per_sec": 4200.5,
+        "packet_count": 450
+      },
+      {
+        "alert_id": "a001-2",
+        "timestamp": "2017-07-04T09:05:31",
+        "src_ip": "172.16.0.1",
+        "dst_ip": "192.168.10.50",
+        "dst_port": 22,
+        "protocol": "TCP",
+        "attack_type": "SSH-Patator",
+        "flow_bytes_per_sec": 3900.0,
+        "packet_count": 420
+      },
+      {
+        "alert_id": "a001-3",
+        "timestamp": "2017-07-04T09:11:08",
+        "src_ip": "172.16.0.1",
+        "dst_ip": "192.168.10.50",
+        "dst_port": 22,
+        "protocol": "TCP",
+        "attack_type": "SSH-Patator",
+        "flow_bytes_per_sec": 250.0,
+        "packet_count": 12
+      }
+    ],
+    "ground_truth": {
+      "session_count": 1,
+      "attacker_ips": ["172.16.0.1"],
+      "kill_chain": ["TA0006", "TA0001"],
+      "kill_chain_labels": ["Credential Access", "Initial Access"],
+      "mitre_techniques": ["T1110.001"],
+      "severity_band": "high",
+      "annotator_notes": "Classic SSH-Patator pattern — high packet rate to port 22, success implied by final low-flow connection."
+    }
+  },
+  {
+    "scenario_id": "S002",
+    "name": "Port Scan → Brute-Force → Exfiltration",
+    "description": "Full 4-stage kill chain: reconnaissance, credential access, initial access, and data exfiltration.",
+    "alerts": [
+      {
+        "alert_id": "a002-1",
+        "timestamp": "2017-07-05T10:00:00",
+        "src_ip": "10.0.0.5",
+        "dst_ip": "192.168.1.0",
+        "dst_port": 0,
+        "protocol": "TCP",
+        "attack_type": "PortScan",
+        "flow_bytes_per_sec": 12000.0,
+        "packet_count": 1100
+      },
+      {
+        "alert_id": "a002-2",
+        "timestamp": "2017-07-05T10:05:00",
+        "src_ip": "10.0.0.5",
+        "dst_ip": "192.168.1.10",
+        "dst_port": 21,
+        "protocol": "TCP",
+        "attack_type": "FTP-Patator",
+        "flow_bytes_per_sec": 5500.0,
+        "packet_count": 380
+      },
+      {
+        "alert_id": "a002-3",
+        "timestamp": "2017-07-05T10:12:00",
+        "src_ip": "10.0.0.5",
+        "dst_ip": "192.168.1.10",
+        "dst_port": 21,
+        "protocol": "TCP",
+        "attack_type": "FTP-Patator",
+        "flow_bytes_per_sec": 180.0,
+        "packet_count": 8
+      },
+      {
+        "alert_id": "a002-4",
+        "timestamp": "2017-07-05T10:55:00",
+        "src_ip": "192.168.1.10",
+        "dst_ip": "203.0.113.5",
+        "dst_port": 443,
+        "protocol": "TCP",
+        "attack_type": "Infiltration",
+        "flow_bytes_per_sec": 85000.0,
+        "packet_count": 9200
+      }
+    ],
+    "ground_truth": {
+      "session_count": 1,
+      "attacker_ips": ["10.0.0.5"],
+      "kill_chain": ["TA0043", "TA0006", "TA0001", "TA0010"],
+      "kill_chain_labels": ["Reconnaissance", "Credential Access", "Initial Access", "Exfiltration"],
+      "mitre_techniques": ["T1595", "T1110.001", "T1078", "T1048"],
+      "severity_band": "critical",
+      "annotator_notes": "Textbook linear kill chain. Alert a002-3 (low bytes) signals successful login. Alert a002-4 is large HTTPS outbound — exfiltration."
+    }
+  },
+  {
+    "scenario_id": "S003",
+    "name": "DDoS Attack — Single Attacker",
+    "description": "High-volume SYN flood targeting a single host — impact phase only.",
+    "alerts": [
+      {
+        "alert_id": "a003-1",
+        "timestamp": "2017-07-07T14:00:00",
+        "src_ip": "192.168.100.4",
+        "dst_ip": "192.168.1.25",
+        "dst_port": 80,
+        "protocol": "TCP",
+        "attack_type": "DDoS",
+        "flow_bytes_per_sec": 950000.0,
+        "packet_count": 48000
+      },
+      {
+        "alert_id": "a003-2",
+        "timestamp": "2017-07-07T14:00:45",
+        "src_ip": "192.168.100.4",
+        "dst_ip": "192.168.1.25",
+        "dst_port": 80,
+        "protocol": "TCP",
+        "attack_type": "DDoS",
+        "flow_bytes_per_sec": 870000.0,
+        "packet_count": 44000
+      },
+      {
+        "alert_id": "a003-3",
+        "timestamp": "2017-07-07T14:02:10",
+        "src_ip": "192.168.100.4",
+        "dst_ip": "192.168.1.25",
+        "dst_port": 80,
+        "protocol": "TCP",
+        "attack_type": "DDoS",
+        "flow_bytes_per_sec": 920000.0,
+        "packet_count": 46500
+      }
+    ],
+    "ground_truth": {
+      "session_count": 1,
+      "attacker_ips": ["192.168.100.4"],
+      "kill_chain": ["TA0040"],
+      "kill_chain_labels": ["Impact"],
+      "mitre_techniques": ["T1498.001"],
+      "severity_band": "critical",
+      "annotator_notes": "Short-duration ultra-high volume floods. Single-phase kill chain — Impact only. KCV will be very high."
+    }
+  },
+  {
+    "scenario_id": "S004",
+    "name": "Two Concurrent Attackers — Clustering Test",
+    "description": "Two independent attackers active simultaneously. DBASC must split them into two sessions.",
+    "alerts": [
+      {
+        "alert_id": "a004-1",
+        "timestamp": "2017-07-05T11:00:00",
+        "src_ip": "10.1.0.10",
+        "dst_ip": "192.168.1.5",
+        "dst_port": 22,
+        "protocol": "TCP",
+        "attack_type": "SSH-Patator",
+        "flow_bytes_per_sec": 4100.0,
+        "packet_count": 430
+      },
+      {
+        "alert_id": "a004-2",
+        "timestamp": "2017-07-05T11:01:30",
+        "src_ip": "172.31.0.20",
+        "dst_ip": "192.168.1.8",
+        "dst_port": 0,
+        "protocol": "TCP",
+        "attack_type": "PortScan",
+        "flow_bytes_per_sec": 11000.0,
+        "packet_count": 950
+      },
+      {
+        "alert_id": "a004-3",
+        "timestamp": "2017-07-05T11:03:00",
+        "src_ip": "10.1.0.10",
+        "dst_ip": "192.168.1.5",
+        "dst_port": 22,
+        "protocol": "TCP",
+        "attack_type": "SSH-Patator",
+        "flow_bytes_per_sec": 3850.0,
+        "packet_count": 410
+      },
+      {
+        "alert_id": "a004-4",
+        "timestamp": "2017-07-05T11:06:00",
+        "src_ip": "172.31.0.20",
+        "dst_ip": "192.168.1.8",
+        "dst_port": 21,
+        "protocol": "TCP",
+        "attack_type": "FTP-Patator",
+        "flow_bytes_per_sec": 5200.0,
+        "packet_count": 360
+      }
+    ],
+    "ground_truth": {
+      "session_count": 2,
+      "attacker_ips": ["10.1.0.10", "172.31.0.20"],
+      "sessions": {
+        "session_A": {
+          "attacker_ip": "10.1.0.10",
+          "kill_chain": ["TA0006"],
+          "kill_chain_labels": ["Credential Access"],
+          "mitre_techniques": ["T1110.001"]
+        },
+        "session_B": {
+          "attacker_ip": "172.31.0.20",
+          "kill_chain": ["TA0043", "TA0006"],
+          "kill_chain_labels": ["Reconnaissance", "Credential Access"],
+          "mitre_techniques": ["T1595", "T1110.001"]
+        }
+      },
+      "severity_band": "high",
+      "annotator_notes": "Primary test for DBASC — must separate 10.1.0.10 and 172.31.0.20 into two distinct sessions despite interleaved timestamps."
+    }
+  },
+  {
+    "scenario_id": "S005",
+    "name": "Web Attack — XSS + SQL Injection",
+    "description": "Attacker probes web application with XSS and SQL injection attempts.",
+    "alerts": [
+      {
+        "alert_id": "a005-1",
+        "timestamp": "2017-07-06T13:00:00",
+        "src_ip": "192.168.2.50",
+        "dst_ip": "192.168.1.100",
+        "dst_port": 80,
+        "protocol": "TCP",
+        "attack_type": "Web Attack \u2013 XSS",
+        "flow_bytes_per_sec": 1200.0,
+        "packet_count": 55
+      },
+      {
+        "alert_id": "a005-2",
+        "timestamp": "2017-07-06T13:02:15",
+        "src_ip": "192.168.2.50",
+        "dst_ip": "192.168.1.100",
+        "dst_port": 80,
+        "protocol": "TCP",
+        "attack_type": "Web Attack \u2013 Sql Injection",
+        "flow_bytes_per_sec": 980.0,
+        "packet_count": 42
+      },
+      {
+        "alert_id": "a005-3",
+        "timestamp": "2017-07-06T13:04:30",
+        "src_ip": "192.168.2.50",
+        "dst_ip": "192.168.1.100",
+        "dst_port": 80,
+        "protocol": "TCP",
+        "attack_type": "Web Attack \u2013 Sql Injection",
+        "flow_bytes_per_sec": 1100.0,
+        "packet_count": 48
+      }
+    ],
+    "ground_truth": {
+      "session_count": 1,
+      "attacker_ips": ["192.168.2.50"],
+      "kill_chain": ["TA0043", "TA0001"],
+      "kill_chain_labels": ["Reconnaissance", "Initial Access"],
+      "mitre_techniques": ["T1190", "T1059.007"],
+      "severity_band": "medium",
+      "annotator_notes": "Low-volume but targeted web exploitation. XSS = probe/discovery, SQL Injection = exploitation attempt (Initial Access)."
+    }
+  },
+  {
+    "scenario_id": "S006",
+    "name": "Bot / C2 Beacon Pattern",
+    "description": "Compromised host beaconing to external C2 server at regular intervals.",
+    "alerts": [
+      {
+        "alert_id": "a006-1",
+        "timestamp": "2017-07-05T08:00:00",
+        "src_ip": "192.168.10.15",
+        "dst_ip": "198.51.100.42",
+        "dst_port": 443,
+        "protocol": "TCP",
+        "attack_type": "Bot",
+        "flow_bytes_per_sec": 320.0,
+        "packet_count": 18
+      },
+      {
+        "alert_id": "a006-2",
+        "timestamp": "2017-07-05T08:05:00",
+        "src_ip": "192.168.10.15",
+        "dst_ip": "198.51.100.42",
+        "dst_port": 443,
+        "protocol": "TCP",
+        "attack_type": "Bot",
+        "flow_bytes_per_sec": 315.0,
+        "packet_count": 17
+      },
+      {
+        "alert_id": "a006-3",
+        "timestamp": "2017-07-05T08:10:00",
+        "src_ip": "192.168.10.15",
+        "dst_ip": "198.51.100.42",
+        "dst_port": 443,
+        "protocol": "TCP",
+        "attack_type": "Bot",
+        "flow_bytes_per_sec": 330.0,
+        "packet_count": 19
+      },
+      {
+        "alert_id": "a006-4",
+        "timestamp": "2017-07-05T08:15:00",
+        "src_ip": "192.168.10.15",
+        "dst_ip": "198.51.100.42",
+        "dst_port": 443,
+        "protocol": "TCP",
+        "attack_type": "Bot",
+        "flow_bytes_per_sec": 318.0,
+        "packet_count": 17
+      }
+    ],
+    "ground_truth": {
+      "session_count": 1,
+      "attacker_ips": ["192.168.10.15"],
+      "kill_chain": ["TA0011"],
+      "kill_chain_labels": ["Command and Control"],
+      "mitre_techniques": ["T1071.001"],
+      "severity_band": "high",
+      "annotator_notes": "Regular 5-minute beacon intervals at constant low byte rate — textbook C2 keep-alive. Note: source IP is internal (compromised host)."
+    }
+  },
+  {
+    "scenario_id": "S007",
+    "name": "FTP Brute-Force Only — Incomplete Chain",
+    "description": "FTP-Patator attack with no evidence of successful login or subsequent activity.",
+    "alerts": [
+      {
+        "alert_id": "a007-1",
+        "timestamp": "2017-07-04T15:00:00",
+        "src_ip": "10.5.0.33",
+        "dst_ip": "192.168.5.20",
+        "dst_port": 21,
+        "protocol": "TCP",
+        "attack_type": "FTP-Patator",
+        "flow_bytes_per_sec": 3800.0,
+        "packet_count": 390
+      },
+      {
+        "alert_id": "a007-2",
+        "timestamp": "2017-07-04T15:04:20",
+        "src_ip": "10.5.0.33",
+        "dst_ip": "192.168.5.20",
+        "dst_port": 21,
+        "protocol": "TCP",
+        "attack_type": "FTP-Patator",
+        "flow_bytes_per_sec": 3650.0,
+        "packet_count": 375
+      },
+      {
+        "alert_id": "a007-3",
+        "timestamp": "2017-07-04T15:09:00",
+        "src_ip": "10.5.0.33",
+        "dst_ip": "192.168.5.20",
+        "dst_port": 21,
+        "protocol": "TCP",
+        "attack_type": "FTP-Patator",
+        "flow_bytes_per_sec": 3750.0,
+        "packet_count": 382
+      }
+    ],
+    "ground_truth": {
+      "session_count": 1,
+      "attacker_ips": ["10.5.0.33"],
+      "kill_chain": ["TA0006"],
+      "kill_chain_labels": ["Credential Access"],
+      "mitre_techniques": ["T1110.001"],
+      "severity_band": "medium",
+      "annotator_notes": "Partial chain — brute force with no observable success. Tests TKCI handling of single-phase sessions."
+    }
+  },
+  {
+    "scenario_id": "S008",
+    "name": "Infiltration — Dropbox Exfiltration",
+    "description": "Attacker uses a legitimate cloud service (Dropbox-like) for covert data exfiltration.",
+    "alerts": [
+      {
+        "alert_id": "a008-1",
+        "timestamp": "2017-07-06T16:00:00",
+        "src_ip": "192.168.1.55",
+        "dst_ip": "162.125.5.100",
+        "dst_port": 443,
+        "protocol": "TCP",
+        "attack_type": "Infiltration",
+        "flow_bytes_per_sec": 75000.0,
+        "packet_count": 8200
+      },
+      {
+        "alert_id": "a008-2",
+        "timestamp": "2017-07-06T16:08:00",
+        "src_ip": "192.168.1.55",
+        "dst_ip": "162.125.5.100",
+        "dst_port": 443,
+        "protocol": "TCP",
+        "attack_type": "Infiltration",
+        "flow_bytes_per_sec": 68000.0,
+        "packet_count": 7800
+      }
+    ],
+    "ground_truth": {
+      "session_count": 1,
+      "attacker_ips": ["192.168.1.55"],
+      "kill_chain": ["TA0010"],
+      "kill_chain_labels": ["Exfiltration"],
+      "mitre_techniques": ["T1567.002"],
+      "severity_band": "high",
+      "annotator_notes": "CICIDS 'Infiltration' label maps to exfiltration in ATT&CK context — large HTTPS transfer to known cloud storage IP range."
+    }
+  },
+  {
+    "scenario_id": "S009",
+    "name": "Three-Phase Attack — Recon + Exploit + C2",
+    "description": "Attacker moves from discovery through initial access to establishing C2.",
+    "alerts": [
+      {
+        "alert_id": "a009-1",
+        "timestamp": "2017-07-06T09:00:00",
+        "src_ip": "10.10.0.7",
+        "dst_ip": "192.168.0.0",
+        "dst_port": 0,
+        "protocol": "TCP",
+        "attack_type": "PortScan",
+        "flow_bytes_per_sec": 15000.0,
+        "packet_count": 1400
+      },
+      {
+        "alert_id": "a009-2",
+        "timestamp": "2017-07-06T09:15:00",
+        "src_ip": "10.10.0.7",
+        "dst_ip": "192.168.0.30",
+        "dst_port": 80,
+        "protocol": "TCP",
+        "attack_type": "Web Attack \u2013 Sql Injection",
+        "flow_bytes_per_sec": 1050.0,
+        "packet_count": 46
+      },
+      {
+        "alert_id": "a009-3",
+        "timestamp": "2017-07-06T09:25:00",
+        "src_ip": "192.168.0.30",
+        "dst_ip": "203.0.113.77",
+        "dst_port": 8080,
+        "protocol": "TCP",
+        "attack_type": "Bot",
+        "flow_bytes_per_sec": 290.0,
+        "packet_count": 15
+      }
+    ],
+    "ground_truth": {
+      "session_count": 1,
+      "attacker_ips": ["10.10.0.7"],
+      "kill_chain": ["TA0043", "TA0001", "TA0011"],
+      "kill_chain_labels": ["Reconnaissance", "Initial Access", "Command and Control"],
+      "mitre_techniques": ["T1595", "T1190", "T1071.001"],
+      "severity_band": "critical",
+      "annotator_notes": "Note IP pivot — a009-3 src is the victim host (now compromised), beaconing outbound. Tests multi-IP session handling."
+    }
+  },
+  {
+    "scenario_id": "S010",
+    "name": "DoS Goldeneye — Application-Layer Flood",
+    "description": "Application-layer HTTP DoS attack against a web server.",
+    "alerts": [
+      {
+        "alert_id": "a010-1",
+        "timestamp": "2017-07-06T12:00:00",
+        "src_ip": "192.168.2.110",
+        "dst_ip": "192.168.1.80",
+        "dst_port": 80,
+        "protocol": "TCP",
+        "attack_type": "DoS GoldenEye",
+        "flow_bytes_per_sec": 420000.0,
+        "packet_count": 22000
+      },
+      {
+        "alert_id": "a010-2",
+        "timestamp": "2017-07-06T12:01:00",
+        "src_ip": "192.168.2.110",
+        "dst_ip": "192.168.1.80",
+        "dst_port": 80,
+        "protocol": "TCP",
+        "attack_type": "DoS GoldenEye",
+        "flow_bytes_per_sec": 398000.0,
+        "packet_count": 21000
+      },
+      {
+        "alert_id": "a010-3",
+        "timestamp": "2017-07-06T12:02:00",
+        "src_ip": "192.168.2.110",
+        "dst_ip": "192.168.1.80",
+        "dst_port": 80,
+        "protocol": "TCP",
+        "attack_type": "DoS GoldenEye",
+        "flow_bytes_per_sec": 445000.0,
+        "packet_count": 23200
+      },
+      {
+        "alert_id": "a010-4",
+        "timestamp": "2017-07-06T12:04:00",
+        "src_ip": "192.168.2.110",
+        "dst_ip": "192.168.1.80",
+        "dst_port": 80,
+        "protocol": "TCP",
+        "attack_type": "DoS GoldenEye",
+        "flow_bytes_per_sec": 410000.0,
+        "packet_count": 21500
+      }
+    ],
+    "ground_truth": {
+      "session_count": 1,
+      "attacker_ips": ["192.168.2.110"],
+      "kill_chain": ["TA0040"],
+      "kill_chain_labels": ["Impact"],
+      "mitre_techniques": ["T1499.001"],
+      "severity_band": "critical",
+      "annotator_notes": "Application-layer flood at ~430K bytes/sec sustained. Single Impact phase. Very high KCV expected."
+    }
+  }
+]

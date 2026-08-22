@@ -1,12 +1,50 @@
 name: CI
-on: [push, pull_request]
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
 jobs:
   test:
-    runs-on: windows-latest
+    name: Lint & Test
+    runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      - run: pip install -r backend/requirements.txt -r nlp/requirements.txt
-      - run: pytest backend/tests/ nlp/tests/ -v --tb=short
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install backend dependencies
+        run: pip install -r backend/requirements.txt
+
+      - name: Install NLP dependencies
+        run: pip install -r nlp/requirements.txt
+
+      - name: Install evaluation dependencies
+        run: pip install -r evaluation/requirements.txt
+
+      - name: Run backend tests
+        run: pytest backend/tests/ -v --tb=short
+
+      - name: Run NLP tests
+        run: pytest nlp/tests/ -v --tb=short
+
+      - name: Validate ground-truth scenarios JSON
+        run: |
+          python -c "
+          import json, sys
+          data = json.load(open('evaluation/ground_truth/scenarios.json'))
+          assert len(data) >= 10, f'Expected >=10 scenarios, got {len(data)}'
+          for s in data:
+              assert 'scenario_id' in s
+              assert 'ground_truth' in s
+              assert 'kill_chain' in s['ground_truth']
+          print(f'OK — {len(data)} scenarios validated')
+          "
