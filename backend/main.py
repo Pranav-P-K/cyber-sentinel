@@ -49,6 +49,23 @@ async def lifespan(app: FastAPI):
             settings.chroma_collection_name,
         )
 
+    # ── DB init ──────────────────────────────────────────────────────────────
+    from backend.db.database import init_db
+    await init_db()
+    logger.info("SQLite DB tables verified.")
+
+    # ── Pre-warm pipeline (loads SentenceTransformer + ChromaDB on startup) ──
+    from backend.core.pipeline import get_pipeline
+    try:
+        pipeline = get_pipeline()
+        logger.info(
+            "Pipeline warm — KB docs: %d  LLM model: %s",
+            pipeline.kb.get_doc_count(),
+            pipeline.llm.model,
+        )
+    except Exception as exc:
+        logger.warning("Pipeline warm-up failed (non-fatal): %s", exc)
+
     logger.info("Startup complete. LLM backend: %s", settings.ollama_base_url)
     yield
 
@@ -105,11 +122,9 @@ def create_app() -> FastAPI:
             "max_retrieval_rounds": s.max_retrieval_rounds,
         }
 
-    # ── Future routers (registered here as pipeline layers are implemented) ──
-    # from backend.api import alerts, pipeline, reports
-    # app.include_router(alerts.router,   prefix="/alerts",   tags=["alerts"])
-    # app.include_router(pipeline.router, prefix="/pipeline", tags=["pipeline"])
-    # app.include_router(reports.router,  prefix="/reports",  tags=["reports"])
+    # ── Routers ──────────────────────────────────────────────────────────────
+    from backend.api.routes.alerts import router as analyze_router
+    app.include_router(analyze_router)
 
     return app
 
@@ -128,3 +143,4 @@ if __name__ == "__main__":
         reload=True,
         log_level="info",
     )
+
