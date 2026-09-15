@@ -113,12 +113,73 @@ class MITREClassifier:
         }
         return sorted(scores.items(), key=lambda x: x[1], reverse=True)[:k]
 
+    # ── Priority keyword lookup (fires before embedding model) ──────────────
+    # Maps known CICIDS 2017 / Suricata attack labels to their correct tactic.
+    # Keys are lowercased substrings; first match wins.
+    KEYWORD_TACTIC_MAP: dict[str, str] = {
+        # Credential Access
+        "ssh-patator":      "TA0006",
+        "ftp-patator":      "TA0006",
+        "brute force":      "TA0006",
+        "brute-force":      "TA0006",
+        "credential dump":  "TA0006",
+        "mimikatz":         "TA0006",
+        "kerberoast":       "TA0006",
+        "password spray":   "TA0006",
+        "rdp bruteforce":   "TA0006",
+        "rdp-bruteforce":   "TA0006",
+        # Impact
+        "ddos":             "TA0040",
+        "dos hulk":         "TA0040",
+        "dos goldeneye":    "TA0040",
+        "dos slowloris":    "TA0040",
+        "dos slowhttptest": "TA0040",
+        "dos-hulk":         "TA0040",
+        "dos-goldeneye":    "TA0040",
+        "dos-slowloris":    "TA0040",
+        "heartbleed":       "TA0040",
+        "ransomware":       "TA0040",
+        "data wipe":        "TA0040",
+        # Command and Control
+        "bot":              "TA0011",
+        "c2 beacon":        "TA0011",
+        "cobalt strike":    "TA0011",
+        # Exfiltration
+        "infiltration":     "TA0010",
+        "exfil":            "TA0010",
+        "dns tunnel":       "TA0010",
+        # Reconnaissance
+        "portscan":         "TA0043",
+        "port scan":        "TA0043",
+        "network scan":     "TA0043",
+        # Initial Access
+        "web attack":       "TA0001",
+        "sql injection":    "TA0001",
+        "xss":              "TA0001",
+        "phishing":         "TA0001",
+        # Lateral Movement
+        "lateral":          "TA0008",
+        "pass-the-hash":    "TA0008",
+        "psexec":           "TA0008",
+    }
+
     def classify_alert(self, alert: dict) -> tuple[str, float]:
         """
-        Convenience wrapper: build query text from an alert dict and classify.
-        Uses attack_type + protocol + dst_port as the query.
+        Classify an alert dict into a MITRE tactic.
+
+        Priority:
+          1. Exact keyword match on attack_type (fast, deterministic)
+          2. Semantic embedding cosine similarity (fallback for unknown types)
         """
-        attack = alert.get("attack_type", "")
+        attack = alert.get("attack_type", "").strip()
+        attack_lower = attack.lower()
+
+        # Layer 1: keyword lookup — O(n) but n < 50, essentially instant
+        for keyword, tactic_id in self.KEYWORD_TACTIC_MAP.items():
+            if keyword in attack_lower:
+                return tactic_id, 1.0   # confidence=1.0 for exact keyword hits
+
+        # Layer 2: embedding fallback for unknown attack types
         proto  = alert.get("protocol", "TCP")
         port   = alert.get("dst_port", "")
         query  = f"{attack} {proto} port {port}".strip()

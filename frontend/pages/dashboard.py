@@ -1,12 +1,15 @@
 """
 frontend/pages/dashboard.py
 CyberSentinel — Main analysis dashboard page.
-
-Flow:
-  1. User enters/pastes IDS alerts (via alert_input.py component)
-  2. POST /api/v1/analyze
-  3. Render per-session: attack chain timeline + SI gauge + narrative + metadata
 """
+
+import sys
+from pathlib import Path
+
+# Ensure project root is on sys.path regardless of how Streamlit launches this file
+_PROJECT_ROOT = str(Path(__file__).resolve().parent.parent.parent)
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
 
 import json
 import streamlit as st
