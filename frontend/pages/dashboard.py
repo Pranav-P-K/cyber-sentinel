@@ -116,14 +116,18 @@ with st.container():
 
 if submitted and alerts:
 
-    with st.spinner("🔍 Analysing alerts — CGAR retrieval + TKCI clustering + LLM narrative…"):
+    with st.spinner("🔍 Analysing alerts with CyberSentinel — CGAR retrieval + TKCI clustering + LLM narrative (takes ~2–3 mins on CPU, ~30s on GPU)…"):
         try:
             import os
             os.environ["BACKEND_URL"] = api_url
-            response = sync_analyze(alerts)
+            response = sync_analyze(alerts, backend_url=api_url)
         except Exception as exc:
             st.error(f"❌ Backend error: {exc}")
             st.stop()
+
+    if not response:
+        st.error("API error: No response returned from backend.")
+        st.stop()
 
     if "error" in response:
         st.error(f"API error: {response['error']}")
@@ -194,7 +198,7 @@ if submitted and alerts:
             )
 
             # Raw JSON toggle
-            with st.expander("🔧 Raw session JSON", expanded=False):
+            if st.checkbox("🔧 Show raw session JSON", key=f"raw_json_{i}", value=False):
                 st.json(session)
 
     # ── Download report ───────────────────────────────────────────────────────
